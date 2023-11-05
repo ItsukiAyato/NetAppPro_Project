@@ -21,10 +21,10 @@ public class UltraF_Client {
 
                 String serverData = inStream.readLine();
                 System.out.println("Response from Server:\n" + serverData);
-                do {
+                while(!serverData.equals("-END-")) {
                     serverData = inStream.readLine();
                     System.out.println(serverData);
-                } while(!serverData.equals("-END-"));
+                }
                 System.out.println();
 
                 if (clientData.equalsIgnoreCase("exit")) break;
