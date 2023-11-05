@@ -3,46 +3,48 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class UltraF_Client {
-    private static final String Domain = "localhost";
-    private static final int PORT = 6161;
+    private static String host = "localhost";
+    private static int port = 5656;
+    private static Socket socket;
+    private static BufferedReader inStream;
+    private static BufferedWriter outStream;
+    private static BufferedReader stdIn;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         try {
-            Socket socket = new Socket(Domain, PORT);
-            BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            BufferedWriter outStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+            socket = new Socket(host, port);
+            inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            outStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            stdIn = new BufferedReader(new InputStreamReader(System.in));
+            String input;
 
             while (true) {
                 System.out.print("Enter Data: ");
-                String clientData = stdIn.readLine();
-                outStream.write(clientData + "\n");
+                input = stdIn.readLine();
+                if (input.equalsIgnoreCase("exit")) break;
+                outStream.write(input + "\n");
                 outStream.flush();
 
-                String serverData = inStream.readLine();
-                System.out.println("Response from Server:\n" + serverData);
-                while(!serverData.equals("-END-")) {
-                    serverData = inStream.readLine();
-                    System.out.println(serverData);
+                String res = inStream.readLine();
+                System.out.println("Response from Server:\n");
+                while(!res.equals("-END-")) {
+                    System.out.println(res);
+                    res = inStream.readLine();
                 }
                 System.out.println();
-
-                if (clientData.equalsIgnoreCase("exit")) break;
             }
-
-            stdIn.close();
-            inStream.close();
-            outStream.close();
-            socket.close();
-            System.out.println("\nClient is closed!");
-        } catch (UnknownHostException e) {
-            System.out.println("Error: Bad Request");
-            System.out.println("StatusCode: 400");
-            System.out.println("Message: Url is not valid!");
         } catch (IOException e) {
             System.out.println("Error: Internal Server Error");
             System.out.println("StatusCode: 500");
-            System.out.println("Message: " + e.getMessage());
+            System.out.println("Message: " + e.toString());
+        } finally {
+            if(socket!=null) {
+                stdIn.close();
+                inStream.close();
+                outStream.close();
+                socket.close();
+                System.out.println("Client is closed");
+            }
         }
     }
 }
