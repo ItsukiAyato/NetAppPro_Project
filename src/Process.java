@@ -24,8 +24,15 @@ public class Process implements Runnable {
 
         try {
             Document searchingSong = Jsoup.connect(dataSource1).method(Connection.Method.GET).ignoreContentType(true).execute().parse();
-            Element songInfoBlock = searchingSong.select("div[data-lyricid]").last();
-            Elements lyricElements = songInfoBlock.select("div[jsname='U8S5sf'] > span");
+            Element songInfoBlock = null;
+            Elements lyricElements = null;
+            try {
+                songInfoBlock = searchingSong.select("div[data-lyricid]").last();
+                lyricElements = songInfoBlock.select("div[jsname='U8S5sf'] > span");
+            } catch (Exception e) {
+                return "Error: Bad Request\nStatus: 400\nMessage: Tên bài hát không hợp lệ\n-END-\n";
+            }
+
             String musician = songInfoBlock.select(".auw0zb").first().text();
             if (musician.isBlank()) {
                 Document searchingSong2 = Jsoup.connect(dataSource2).method(Connection.Method.GET).ignoreContentType(true).execute().parse();
