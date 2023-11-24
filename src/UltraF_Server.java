@@ -17,7 +17,7 @@ public class UltraF_Server {
             System.out.println("Waiting for client...");
             while(true) {
                 Socket socket = server.accept();
-                executor.execute(new Process(socket));
+                executor.execute(new Process2(socket));
             }
         } catch (IOException e) {
             System.out.println("Error: Internal Server Error");
